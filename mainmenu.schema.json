@@ -467,6 +467,10 @@
                 }
               ]
             },
+            "animate": {
+              "type": "boolean",
+              "description": "Whether a slideshow background should use Garry's Mod-style motion. Slides cycle through left/right rotation with zoom in/out and a static variant while crossfading."
+            },
             "slideshow": {
               "$ref": "#/definitions/slideshow"
             }

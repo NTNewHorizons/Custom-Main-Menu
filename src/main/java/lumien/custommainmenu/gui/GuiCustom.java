@@ -209,16 +209,24 @@ public class GuiCustom extends GuiScreen implements GuiYesNoCallback {
             if (!background.ichBinEineSlideshow) {
                 GlStateManager.enableBlend();
                 background.image.bind();
-                this.drawBackground(background.mode);
+                this.drawBackground(background.mode, -1.0f, -1, 0);
                 GlStateManager.disableBlend();
             } else {
                 background.slideShow.getCurrentResource1().bind();
-                this.drawBackground(background.mode);
+                this.drawBackground(
+                        background.mode,
+                        background.animate ? background.slideShow.getCurrentResource1Age(partialTicks) : -1.0f,
+                        background.slideShow.getCurrentResource1AnimationVariant(),
+                        background.slideShow.getAnimationDuration());
                 if (background.slideShow.fading()) {
                     GlStateManager.enableBlend();
                     background.slideShow.getCurrentResource2().bind();
                     GlStateManager.color(1.0f, 1.0f, 1.0f, background.slideShow.getAlphaFade(partialTicks));
-                    this.drawBackground(background.mode);
+                    this.drawBackground(
+                            background.mode,
+                            background.animate ? background.slideShow.getCurrentResource2Age(partialTicks) : -1.0f,
+                            background.slideShow.getCurrentResource2AnimationVariant(),
+                            background.slideShow.getAnimationDuration());
                     GlStateManager.disableBlend();
                     GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
                 }
@@ -285,7 +293,28 @@ public class GuiCustom extends GuiScreen implements GuiYesNoCallback {
         }
     }
 
-    private void drawBackground(Background.MODE mode) {
+    private void drawBackground(Background.MODE mode, float animationAge, int animationVariant, int animationDuration) {
+        if (animationAge >= 0.0f) {
+            float ageSeconds = animationAge / 20.0f;
+            float scaleAge = animationAge;
+            if (animationVariant == 2 || animationVariant == 3) {
+                scaleAge = Math.max(0.0f, (float) animationDuration - animationAge);
+            }
+            float scale = (float) Math.sqrt(1.0f + 2.0f * (0.3f / 30.0f) * scaleAge / 20.0f);
+            if (animationVariant == 2 || animationVariant == 3) {
+                scale += 0.2f;
+            } else if (animationVariant == 4) {
+                scale = 1.0f;
+            }
+            float angleDirection = animationVariant == 1 || animationVariant == 3 ? 1.0f : -1.0f;
+            float angle = animationVariant == 4 ? 0.0f : angleDirection * (5.0f / 30.0f) * ageSeconds;
+            GlStateManager.pushMatrix();
+            GlStateManager.translate((float) this.width / 2.0f, (float) this.height / 2.0f, 0.0f);
+            GlStateManager.rotate(angle, 0.0f, 0.0f, 1.0f);
+            GlStateManager.scale(scale, scale, 1.0f);
+            GlStateManager.translate((float) -this.width / 2.0f, (float) -this.height / 2.0f, 0.0f);
+        }
+
         int imageWidth = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH);
         int imageHeight = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT);
         int drawWidth = 0;
@@ -301,7 +330,9 @@ public class GuiCustom extends GuiScreen implements GuiYesNoCallback {
                     drawWidth = (int) ((float) imageWidth * factorHeight);
                     drawHeight = (int) ((float) imageHeight * factorHeight);
                 }
-                RenderUtil.drawPartialImage(0, 0, 0, 0, drawWidth, drawHeight, imageWidth, imageHeight);
+                int drawX = animationAge >= 0.0f ? (this.width - drawWidth) / 2 : 0;
+                int drawY = animationAge >= 0.0f ? (this.height - drawHeight) / 2 : 0;
+                RenderUtil.drawPartialImage(drawX, drawY, 0, 0, drawWidth, drawHeight, imageWidth, imageHeight);
                 break;
             }
             case STRETCH: {
@@ -326,6 +357,10 @@ public class GuiCustom extends GuiScreen implements GuiYesNoCallback {
                 }
                 break;
             }
+        }
+
+        if (animationAge >= 0.0f) {
+            GlStateManager.popMatrix();
         }
     }
 

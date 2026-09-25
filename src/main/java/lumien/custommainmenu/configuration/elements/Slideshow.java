@@ -47,6 +47,32 @@ public class Slideshow extends Element {
         return durationTeiler * counterProgress;
     }
 
+    public float getCurrentResource1Age(float partial) {
+        int cycleDuration = this.displayDuration + this.fadeDuration;
+        float age = ((float) this.counter + partial) % (float) cycleDuration;
+        if (this.counter >= cycleDuration) {
+            age += this.fadeDuration;
+        }
+        return age;
+    }
+
+    public float getCurrentResource2Age(float partial) {
+        return ((float) this.counter + partial) % (float) (this.displayDuration + this.fadeDuration)
+                - (float) this.displayDuration;
+    }
+
+    public int getCurrentResource1AnimationVariant() {
+        return this.counter / (this.displayDuration + this.fadeDuration) % 5;
+    }
+
+    public int getCurrentResource2AnimationVariant() {
+        return (this.counter / (this.displayDuration + this.fadeDuration) + 1) % 5;
+    }
+
+    public int getAnimationDuration() {
+        return this.displayDuration + 2 * this.fadeDuration;
+    }
+
     public ITexture getCurrentResource1() {
         int index = this.counter / (this.displayDuration + this.fadeDuration) % this.ressources.length;
         return this.ressources[index];

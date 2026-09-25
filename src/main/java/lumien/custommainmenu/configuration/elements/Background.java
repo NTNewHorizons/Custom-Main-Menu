@@ -9,6 +9,7 @@ public class Background extends Element {
 
     public final ITexture image;
     public MODE mode;
+    public boolean animate;
     public boolean ichBinEineSlideshow;
     public Slideshow slideShow;
 
@@ -16,6 +17,7 @@ public class Background extends Element {
         super(parent);
         this.image = iTexture;
         this.mode = MODE.FILL;
+        this.animate = false;
         this.ichBinEineSlideshow = false;
         this.slideShow = null;
     }

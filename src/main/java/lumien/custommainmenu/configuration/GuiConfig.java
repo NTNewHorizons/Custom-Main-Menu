@@ -178,6 +178,9 @@ public class GuiConfig {
             if (backgroundObject.has("mode")) {
                 this.background.setMode(backgroundObject.get("mode").getAsString());
             }
+            if (backgroundObject.has("animate")) {
+                this.background.animate = backgroundObject.get("animate").getAsBoolean();
+            }
             if (backgroundObject.has("slideshow")) {
                 JsonObject slideShowObject = backgroundObject.get("slideshow").getAsJsonObject();
                 this.background.ichBinEineSlideshow = true;
